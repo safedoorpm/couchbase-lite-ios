@@ -78,8 +78,8 @@ static void logCallback(C4LogDomain domain, C4LogLevel level, C4Slice message) {
 }
 
 static void dbObserverCallback(C4DatabaseObserver* obs, void* context) {
+    CBLDatabase *db = (__bridge CBLDatabase *)context;
     dispatch_async(dispatch_get_main_queue(), ^{
-        CBLDatabase *db = (__bridge CBLDatabase *)context;
         [db postDatabaseChanged];
     });
 }
@@ -202,6 +202,7 @@ static void dbObserverCallback(C4DatabaseObserver* obs, void* context) {
 
 - (void) dealloc {
     c4db_free(_c4db);
+    c4dbobs_free(_obs);
 }
 
 
@@ -224,7 +225,7 @@ static void dbObserverCallback(C4DatabaseObserver* obs, void* context) {
     c4dbobs_free(_obs);
     _c4db = nullptr;
     _obs = nullptr;
-    
+
     return YES;
 }
 
@@ -369,16 +370,24 @@ static NSString* databasePath(NSString* name, NSString* dir) {
         bool newExternal;
         changes = c4dbobs_getChanges(_obs, c4docIDs, maxChanges, &lastSequence, &newExternal);
         if(changes == 0 || external != newExternal || docIDs.count > 1000) {
-            NSDictionary *userInfo = @{kCBLDatabaseChangesUserInfoKey: docIDs,
-                                       kCBLDatabaseLastSequenceUserInfoKey: @(lastSequence),
-                                       kCBLDatabaseIsExternalUserInfoKey: @(external)};
-            [[NSNotificationCenter defaultCenter] postNotificationName:kCBLDatabaseChangeNotification object:self userInfo:userInfo];
-            docIDs = [NSMutableArray new];
+            if(docIDs.count > 0) {
+                // Only notify if there are actually changes to send
+                NSDictionary *userInfo = @{kCBLDatabaseChangesUserInfoKey: docIDs,
+                                           kCBLDatabaseLastSequenceUserInfoKey: @(lastSequence),
+                                           kCBLDatabaseIsExternalUserInfoKey: @(external)};
+                [[NSNotificationCenter defaultCenter] postNotificationName:kCBLDatabaseChangeNotification object:self userInfo:userInfo];
+                docIDs = [NSMutableArray new];
+            }
         }
-        
+
         external = newExternal;
-        for(int i = 0; i < changes; i++) {
-            [docIDs addObject:slice2string(c4docIDs[i])];
+        for(uint32_t i = 0; i < changes; i++) {
+            NSString *docID =slice2string(c4docIDs[i]);
+            [docIDs addObject:docID];
+            CBLDocument* doc = [_documents objectForKey:docID];
+            if(external) {
+                [doc changedExternally];
+            }
         }
         
     } while(changes > 0);

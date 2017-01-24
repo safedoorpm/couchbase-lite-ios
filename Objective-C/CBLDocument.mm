@@ -21,20 +21,18 @@
 #include "c4Observer.h"
 
 NSString* const kCBLDocumentChangeNotification = @"CBLDocumentChangeNotification";
-NSString* const kCBLDocumentIDUserInfoKey = @"CBLDocumentIDUserInfoKey";
-NSString* const kCBLDocumentSeqUserInfoKey = @"CBLDocumentSeqUserInfoKey";
+NSString* const kCBLDocumentSavedNotification = @"CBLDocumentSavedNotification";
+NSString* const kCBLDocumentIsExternalUserInfoKey = @"CBLDocumentIsExternalUserInfoKey";
 
-static void docObserverCallback(C4DocumentObserver* obs, C4Slice docID, uint64_t sequence, void* context) {
-    NSDictionary *userInfo = @{kCBLDocumentIDUserInfoKey:slice2string(docID),
-                               kCBLDocumentSeqUserInfoKey:@(sequence)};
-    CBLDocument* doc = (__bridge CBLDocument*)context;
-    [[NSNotificationCenter defaultCenter] postNotificationName:kCBLDocumentChangeNotification object:doc userInfo:userInfo];
-}
+@interface CBLDocument ()
+
+- (void)postChangedNotificationExternal:(BOOL)external;
+
+@end
 
 @implementation CBLDocument {
     C4Database* _c4db;
     C4Document* _c4doc;
-    C4DocumentObserver* _obs;
 }
 
 @synthesize documentID=_documentID, database=_database;
@@ -58,7 +56,6 @@ static void docObserverCallback(C4DocumentObserver* obs, C4Slice docID, uint64_t
 
 - (void) dealloc {
     c4doc_free(_c4doc);
-    c4docobs_free(_obs);
 }
 
 
@@ -140,8 +137,43 @@ static void docObserverCallback(C4DocumentObserver* obs, C4Slice docID, uint64_t
     }
 }
 
+- (void)setObject:(id)value forKeyedSubscript:(NSString *)key {
+    [super setObject:value forKeyedSubscript:key];
+    [self noteChanged];
+}
+
+- (void)setProperties:(NSDictionary *)properties {
+    [super setProperties:properties];
+    [self noteChanged];
+}
+
+#pragma mark - INTERNAL
+
+- (void)changedExternally {
+    // The current API design decision is that when a document has unsaved changes, it should
+    // not update with external changes and should not post notifications. Instead the conflict
+    // resolution will happen when the app saves the document.
+
+    if(!self.hasChanges) {
+        [self loadDoc:nil mustExist:YES];
+        [self postChangedNotificationExternal:YES];
+    }
+}
+
 #pragma mark - PRIVATE
 
+- (void)noteChanged {
+    self.hasChanges = YES;
+    [[NSNotificationCenter defaultCenter] postNotificationName: kCBLDocumentChangeNotification
+                                                        object: self];
+}
+
+- (void)postChangedNotificationExternal:(BOOL)external {
+    NSDictionary* userInfo = external ? @{kCBLDocumentIsExternalUserInfoKey: @YES} : nil;
+    [[NSNotificationCenter defaultCenter] postNotificationName: kCBLDocumentSavedNotification
+                                                      object: self
+                                                    userInfo: userInfo];
+}
 
 - (BOOL) loadDoc: (NSError**)outError mustExist: (BOOL)mustExist {
     auto doc = [self readC4Doc: outError mustExist: mustExist];
@@ -172,9 +204,6 @@ static void docObserverCallback(C4DocumentObserver* obs, C4Slice docID, uint64_t
             FLDict root = FLValue_AsDict(FLValue_FromTrustedData({body.buf, body.size}));
             [self setRootDict: root orProperties: nil];
         }
-        
-        c4docobs_free(_obs);
-        _obs = c4docobs_create(_c4db, _c4doc->docID, docObserverCallback, (__bridge void*)self);
     }
 }
 
@@ -231,6 +260,7 @@ static void docObserverCallback(C4DocumentObserver* obs, C4Slice docID, uint64_t
     }
     
     [self setC4Doc: newDoc];
+    [self postChangedNotificationExternal:NO];
     if (deletion)
         [self resetChanges];
     
