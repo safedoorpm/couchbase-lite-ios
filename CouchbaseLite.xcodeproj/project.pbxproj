@@ -4424,6 +4424,7 @@
 				TargetAttributes = {
 					2700358A1A44E9270015B9F4 = {
 						CreatedOnToolsVersion = 6.1.1;
+						LastSwiftMigration = 0820;
 						TestTargetID = 27B0B80A1492C16300A817AD;
 					};
 					272AA83E1A48D835004B8D55 = {
@@ -5820,6 +5821,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27FFFF1E1C973FB5001A70FC /* iOS Unit Tests_Debug.xcconfig */;
 			buildSettings = {
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -5827,6 +5829,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27FFFF1F1C973FB5001A70FC /* iOS Unit Tests_Release.xcconfig */;
 			buildSettings = {
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
