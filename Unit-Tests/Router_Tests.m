@@ -1354,7 +1354,7 @@ static void CheckCacheable(Router_Tests* self, NSString* path) {
     [db setValidationNamed: @"onlyMyDocs"
                    asBlock: ^(CBLRevision *rev, id<CBLValidationContext> context) {
                        if (!rev.isDeletion) {
-                           if (![rev.properties[@"type"] isEqualToString:@"doc"])
+                           if (![rev.properties[@"doc_type"] isEqualToString:@"doc"])
                                [context reject];
                            else if (![rev.properties[@"from"] isEqualToString:@"me"])
                                [context rejectWithMessage: @"This is not a user doc."];
@@ -1369,7 +1369,7 @@ static void CheckCacheable(Router_Tests* self, NSString* path) {
 
     // do_POST OK:
     result = SendBody(self, @"POST", @"/db",
-             $dict({@"type", @"doc"},
+             $dict({@"doc_type", @"doc"},
                    {@"from", @"me"},
                    {@"title", @"doc1"}), kCBLStatusCreated, nil);
     Assert(result[@"ok"] != nil);
@@ -1378,7 +1378,7 @@ static void CheckCacheable(Router_Tests* self, NSString* path) {
 
     // do_POST forbidden, default message:
     result = SendBody(self, @"POST", @"/db",
-                      $dict({@"type", @"nondoc"},
+                      $dict({@"doc_type", @"nondoc"},
                             {@"from", @"me"},
                             {@"title", @"nondoc1"}), kCBLStatusForbidden, nil);
     AssertNil(result[@"rev"]);
@@ -1388,7 +1388,7 @@ static void CheckCacheable(Router_Tests* self, NSString* path) {
 
     // do_POST forbidden, custom message:
     result = SendBody(self, @"POST", @"/db",
-                      $dict({@"type", @"doc"},
+                      $dict({@"doc_type", @"doc"},
                             {@"from", @"you"},
                             {@"title", @"doc2"}), kCBLStatusForbidden, nil);
     AssertEqual(result[@"status"], @(403));
@@ -1397,7 +1397,7 @@ static void CheckCacheable(Router_Tests* self, NSString* path) {
 
     // do_PUT OK:
     result = SendBody(self, @"PUT", @"/db/doc3",
-                      $dict({@"type", @"doc"},
+                      $dict({@"doc_type", @"doc"},
                             {@"from", @"me"},
                             {@"title", @"doc3"}), kCBLStatusCreated, nil);
     Assert(result[@"ok"] != nil);
@@ -1406,7 +1406,7 @@ static void CheckCacheable(Router_Tests* self, NSString* path) {
 
     // do_PUT forbidden, default message:
     result = SendBody(self, @"PUT", @"/db/doc4",
-                      $dict({@"type", @"nondoc"},
+                      $dict({@"doc_type", @"nondoc"},
                             {@"from", @"me"},
                             {@"title", @"doc4"}), kCBLStatusForbidden, nil);
     AssertNil(result[@"rev"]);
@@ -1416,7 +1416,7 @@ static void CheckCacheable(Router_Tests* self, NSString* path) {
 
     // do_PUT forbidden, custom message:
     result = SendBody(self, @"PUT", @"/db/doc5",
-                      $dict({@"type", @"doc"},
+                      $dict({@"doc_type", @"doc"},
                             {@"from", @"you"},
                             {@"title", @"doc5"}), kCBLStatusForbidden, nil);
     AssertNil(result[@"rev"]);
@@ -1427,10 +1427,10 @@ static void CheckCacheable(Router_Tests* self, NSString* path) {
     // do_POST_bulk_docs, OK:
     NSArray* bulkResult;
     bulkResult = SendBody(self, @"POST", @"/db/_bulk_docs",
-                          $dict({@"docs", $array($dict({@"type", @"doc"},
+                          $dict({@"docs", $array($dict({@"doc_type", @"doc"},
                                                        {@"from", @"me"},
                                                        {@"title", @"doc6"}),
-                                                 $dict({@"type", @"doc"},
+                                                 $dict({@"doc_type", @"doc"},
                                                        {@"from", @"me"},
                                                        {@"title", @"doc7"})
                                                  )}), kCBLStatusCreated, nil);
@@ -1443,13 +1443,13 @@ static void CheckCacheable(Router_Tests* self, NSString* path) {
 
     // do_POST_bulk_docs, mixed result:
     bulkResult = SendBody(self, @"POST", @"/db/_bulk_docs",
-                          $dict({@"docs", $array($dict({@"type", @"doc"},
+                          $dict({@"docs", $array($dict({@"doc_type", @"doc"},
                                                        {@"from", @"me"},
                                                        {@"title", @"doc8"}),
-                                                 $dict({@"type", @"nondoc"},
+                                                 $dict({@"doc_type", @"nondoc"},
                                                        {@"from", @"me"},
                                                        {@"title", @"doc9"}),
-                                                 $dict({@"type", @"doc"},
+                                                 $dict({@"doc_type", @"doc"},
                                                        {@"from", @"you"},
                                                        {@"title", @"doc10"})
                                                  )}), kCBLStatusCreated, nil);
@@ -1467,13 +1467,13 @@ static void CheckCacheable(Router_Tests* self, NSString* path) {
     // do_POST_bulk_docs, all_or_nothing=true
     result = SendBody(self, @"POST", @"/db/_bulk_docs",
                       $dict({@"all_or_nothing", @"true"},
-                            {@"docs", $array($dict({@"type", @"doc"},
+                            {@"docs", $array($dict({@"doc_type", @"doc"},
                                                    {@"from", @"me"},
                                                    {@"title", @"doc11"}),
-                                             $dict({@"type", @"nondoc"},
+                                             $dict({@"doc_type", @"nondoc"},
                                                    {@"from", @"me"},
                                                    {@"title", @"doc12"}),
-                                             $dict({@"type", @"doc"},
+                                             $dict({@"doc_type", @"doc"},
                                                    {@"from", @"you"},
                                                    {@"title", @"doc13"})
                                              )}), kCBLStatusForbidden, nil);
@@ -1484,7 +1484,7 @@ static void CheckCacheable(Router_Tests* self, NSString* path) {
 
     // do_DELETE
     result = SendBody(self, @"PUT", @"/db/doc14",
-                      $dict({@"type", @"doc"},
+                      $dict({@"doc_type", @"doc"},
                             {@"from", @"me"},
                             {@"title", @"doc14"},
                             {@"allow_delete", $false}), kCBLStatusCreated, nil);

@@ -1718,8 +1718,8 @@ static NSArray *CBLISTestInsertEntriesWithProperties(NSManagedObjectContext *con
 
     CBLDocument *doc = [self documentWithID:[entry.objectID documentIDRepresentation]];
     AssertEqual(entry.text, [doc propertyForKey:@"text"]);
-    Assert([[doc.properties allKeys] containsObject:@"type"]);
-    AssertEqual(doc.properties[@"type"], @"Entry");
+    Assert([[doc.properties allKeys] containsObject:@"doc_type"]);
+    AssertEqual(doc.properties[@"doc_type"], @"Entry");
 }
 
 - (void)test_DocTypeKeyBackwardCompat {
@@ -2157,7 +2157,7 @@ static NSArray *CBLISTestInsertEntriesWithProperties(NSManagedObjectContext *con
             for (NSUInteger i = 0; i < docCount; i++) {
                 NSDictionary *properties = @{@"created_at": [CBLJSON JSONObjectWithDate: [NSDate new]],
                                              @"text": [NSString stringWithFormat: @"Test %@", @(i)],
-                                             @"type": @"Entry",
+                                             @"doc_type": @"Entry",
                                              @"check": (i%3) ? @(YES) : @(NO)};
                 CBLDocument *doc = [self createDocumentWithProperties: properties];
                 NSString *docID = doc.documentID;
@@ -2191,7 +2191,7 @@ static NSArray *CBLISTestInsertEntriesWithProperties(NSManagedObjectContext *con
 #pragma mark - CBLIncrementalStoreDelegate
 
 - (NSDictionary *)storeWillSaveDocument:(NSDictionary *)props {
-    if ([props[@"type"] isEqualToString:@"Entry"]) {
+    if ([props[@"doc_type"] isEqualToString:@"Entry"]) {
         NSMutableDictionary* newProps = [props mutableCopy];
         newProps[@"code"] = @"1234";
         return newProps;

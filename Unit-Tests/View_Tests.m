@@ -798,13 +798,13 @@
     CBLView* view = [db viewNamed: @"vu"];
 
     [view setMapBlock: MAPBLOCK({
-        if ([doc[@"type"] isEqualToString:@"user"]) {
+        if ([doc[@"doc_type"] isEqualToString:@"user"]) {
             emit(doc[@"name"], nil);
         }
     }) version: @"1"];
 
     // Create a new document which will not get indexed by the created view:
-    [self createDocumentWithProperties: @{@"type": @"settings", @"allows_guest": @(YES)}];
+    [self createDocumentWithProperties: @{@"doc_type": @"settings", @"allows_guest": @(YES)}];
 
     // Start a new live query object:
     CBLLiveQuery* liveQuery = [[view createQuery] asLiveQuery];
@@ -833,7 +833,7 @@
     Assert(finished, @"Live query timed out!");
 
     // Create a new document which will get indexed by the created view:
-    [self createDocumentWithProperties: @{@"type": @"user", @"name": @"Peter"}];
+    [self createDocumentWithProperties: @{@"doc_type": @"user", @"name": @"Peter"}];
 
     // Wait for the live query to update the result:
     timeout = [NSDate dateWithTimeIntervalSinceNow: 2.0];
@@ -1070,7 +1070,7 @@ static NSDictionary* mkGeoRect(double x0, double y0, double x1, double y1) {
     view1.documentType = @"person";
     [view1 setMapBlock: MAPBLOCK({
         Log(@"view1 mapping: %@", doc);
-        AssertEqual(doc[@"type"], @"person");
+        AssertEqual(doc[@"doc_type"], @"person");
         emit(doc[@"name"], nil);
     }) version: @"1"];
 
@@ -1078,15 +1078,15 @@ static NSDictionary* mkGeoRect(double x0, double y0, double x1, double y1) {
     view2.documentType = @"aardvark";
     [view2 setMapBlock: MAPBLOCK({
         Log(@"view2 mapping: %@", doc);
-        AssertEqual(doc[@"type"], @"aardvark");
+        AssertEqual(doc[@"doc_type"], @"aardvark");
         emit(doc[@"name"], nil);
     }) version: @"1"];
 
     // Create a new document which will not get indexed by the created view:
-    [self createDocumentWithProperties: @{@"type": @"person", @"name": @"mick"}];
-    [self createDocumentWithProperties: @{@"type": @"person", @"name": @"keef"}];
+    [self createDocumentWithProperties: @{@"doc_type": @"person", @"name": @"mick"}];
+    [self createDocumentWithProperties: @{@"doc_type": @"person", @"name": @"keef"}];
     CBLDocument* cerebus;
-    cerebus = [self createDocumentWithProperties: @{@"type": @"aardvark", @"name": @"cerebus"}];
+    cerebus = [self createDocumentWithProperties: @{@"doc_type": @"aardvark", @"name": @"cerebus"}];
 
     CBLQuery* query = [view1 createQuery];
     CBLQueryEnumerator* rows = [query run: NULL];
@@ -1105,7 +1105,7 @@ static NSDictionary* mkGeoRect(double x0, double y0, double x1, double y1) {
     // removed from its index:
     Log(@"---- Update cerebus.type = person ----");
     CBLRevision* rev = [cerebus update: ^BOOL(CBLUnsavedRevision* rev) {
-        rev[@"type"] = @"person";
+        rev[@"doc_type"] = @"person";
         return YES;
     } error: NULL];
     Assert(rev);
@@ -1115,7 +1115,7 @@ static NSDictionary* mkGeoRect(double x0, double y0, double x1, double y1) {
     AssertEq(allRows.count, 0u);
 
     // Make sure a view without a docType will coexist:
-    [self createDocumentWithProperties: @{@"type": @"elf", @"name": @"regency elf"}];
+    [self createDocumentWithProperties: @{@"doc_type": @"elf", @"name": @"regency elf"}];
     CBLView* view3 = [db viewNamed: @"test/all"];
     [view3 setMapBlock: MAPBLOCK({
         Log(@"view3 mapping: %@", doc);
@@ -1223,7 +1223,7 @@ static NSDictionary* mkGeoRect(double x0, double y0, double x1, double y1) {
     CBLView* view = [db viewNamed: @"vu"];
     Assert(view);
     [view setMapBlock: MAPBLOCK({
-        if ([doc[@"type"] isEqualToString: @"task"]) {
+        if ([doc[@"doc_type"] isEqualToString: @"task"]) {
             id date = doc[@"created_at"];
             NSString* listID = doc[@"list_id"];
             emit(@[listID, date], doc);
@@ -1237,17 +1237,17 @@ static NSDictionary* mkGeoRect(double x0, double y0, double x1, double y1) {
     // Create 3 documents:
     CBLDocument* doc1 = [self createDocumentWithProperties:
                          @{@"_id": @"doc1",
-                           @"type": @"task",
+                           @"doc_type": @"task",
                            @"created_at": @"2016-01-29T22:25:01.000Z",
                            @"list_id": listId}];
     CBLDocument* doc2 = [self createDocumentWithProperties:
                          @{@"_id": @"doc2",
-                           @"type": @"task",
+                           @"doc_type": @"task",
                            @"created_at": @"2016-01-29T22:25:02.000Z",
                            @"list_id": listId}];
     CBLDocument* doc3 = [self createDocumentWithProperties:
                          @{@"_id": @"doc3",
-                           @"type": @"task",
+                           @"doc_type": @"task",
                            @"created_at": @"2016-01-29T22:25:03.000Z",
                            @"list_id": listId}];
 
@@ -1300,17 +1300,17 @@ static NSDictionary* mkGeoRect(double x0, double y0, double x1, double y1) {
     // For https://github.com/couchbase/couchbase-lite-ios/issues/1370
     // This is equivalent to the types of queries CBForest runs to display lists of tasks.
     [self createDocumentWithProperties: @{@"_id": @"itemA",
-                                          @"type": @"task",
+                                          @"doc_type": @"task",
                                           @"created_at": @"2016-07-18T22:24:01.000Z",
                                           @"list_id": @"ListA"}];
     [self createDocumentWithProperties: @{@"_id": @"itemB",
-                                          @"type": @"task",
+                                          @"doc_type": @"task",
                                           @"created_at": @"2016-07-18T22:25:01.000Z",
                                           @"list_id": @"ListB"}];
 
     CBLView* view = [db viewNamed: @"tasksByDate"];
     [view setMapBlock: MAPBLOCK({
-        if ([doc[@"type"] isEqualToString: @"task"]) {
+        if ([doc[@"doc_type"] isEqualToString: @"task"]) {
             id date = doc[@"created_at"];
             NSString* listID = doc[@"list_id"];
             emit(@[listID, date], doc);

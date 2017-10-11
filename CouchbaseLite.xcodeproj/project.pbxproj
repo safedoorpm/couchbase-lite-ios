@@ -4439,7 +4439,7 @@
 					};
 					27452BB71AB1180800327776 = {
 						CreatedOnToolsVersion = 6.3;
-						DevelopmentTeam = N2Q372V7W2;
+						DevelopmentTeam = 7HY875J5PT;
 					};
 					275315D414ACF0A10065964D = {
 						DevelopmentTeam = N2Q372V7W2;
@@ -5949,6 +5949,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27FFFF151C973FB5001A70FC /* iOS framework_Debug.xcconfig */;
 			buildSettings = {
+				DEVELOPMENT_TEAM = 7HY875J5PT;
 			};
 			name = Debug;
 		};
@@ -5956,6 +5957,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27FFFF161C973FB5001A70FC /* iOS framework_Release.xcconfig */;
 			buildSettings = {
+				DEVELOPMENT_TEAM = 7HY875J5PT;
 			};
 			name = Release;
 		};

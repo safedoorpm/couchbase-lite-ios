@@ -23,7 +23,7 @@
     [db inTransaction:^BOOL{
         for (NSUInteger i = 0; i < 5000; i++) {
             NSString* type = (i % 10 == 0) ? @"INTP" : @"ESFJ";
-            NSMutableDictionary* props = [@{@"type": type, @"i": @(i)} mutableCopy];
+            NSMutableDictionary* props = [@{@"doc_type": type, @"i": @(i)} mutableCopy];
             for (NSUInteger j = 0; j < 20; j++) {
                 NSString* key = $sprintf(@"%lx", random());
                 id value = @(random());
@@ -52,7 +52,7 @@
 
     CBLView* intpView = [db viewNamed: @"INTP"];
     [intpView setMapBlock: MAPBLOCK({
-        if ([doc[@"type"] isEqualToString: @"INTP"])
+        if ([doc[@"doc_type"] isEqualToString: @"INTP"])
             emit(doc[@"i"], nil);
     }) version: @"1"];
 

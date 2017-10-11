@@ -232,9 +232,9 @@
 
     model.type = @"Dummy";
     AssertEqual(model.type, @"Dummy");
-    AssertEqual([model getValueOfProperty:@"type"], @"Dummy");
+    AssertEqual([model getValueOfProperty:@"doc_type"], @"Dummy");
     AssertEqual(model.propertiesToSave, (@{@"_id": model.document.documentID,
-                                            @"type": @"Dummy"}));
+                                            @"doc_type": @"Dummy"}));
 }
 
 - (void)test00_AutoTypeProperty {
@@ -243,9 +243,9 @@
 
     TestModel *model = [TestModel modelForNewDocumentInDatabase:db];
     AssertEqual(model.type, @"Dummy");
-    AssertEqual([model getValueOfProperty:@"type"], @"Dummy");
+    AssertEqual([model getValueOfProperty:@"doc_type"], @"Dummy");
     AssertEqual(model.propertiesToSave, (@{@"_id": model.document.documentID,
-                                           @"type": @"Dummy"}));
+                                           @"doc_type": @"Dummy"}));
 }
 
 - (void)test00_AutoTypePropertyByString {
@@ -254,9 +254,9 @@
 
     TestModel *model = [TestModel modelForNewDocumentInDatabase:db];
     AssertEqual(model.type, @"Dummy");
-    AssertEqual([model getValueOfProperty:@"type"], @"Dummy");
+    AssertEqual([model getValueOfProperty:@"doc_type"], @"Dummy");
     AssertEqual(model.propertiesToSave, (@{@"_id": model.document.documentID,
-                                           @"type": @"Dummy"}));
+                                           @"doc_type": @"Dummy"}));
 }
 
 - (void) test00_DeleteProperty {

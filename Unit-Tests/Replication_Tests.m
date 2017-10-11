@@ -1240,7 +1240,7 @@ static UInt8 sEncryptionIV[kCCBlockSizeAES128];
 - (XCTestExpectation*) expectationForProgress: (NSProgress*)progress
                                       logging: (BOOL)logging
 {
-    XCKeyValueObservingExpectationHandler handler = ^BOOL(id observedObject, NSDictionary *change) {
+    XCKeyValueObservingeExpectationHandler handler = ^BOOL(id observedObject, NSDictionary *change) {
         NSProgress* p = observedObject;
         if (logging) {
             Log(@"progress = %@", p);

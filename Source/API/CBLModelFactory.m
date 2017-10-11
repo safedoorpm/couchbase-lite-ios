@@ -76,7 +76,7 @@ static CBLModelFactory* sSharedInstance;
 }
 
 - (Class) classForDocument: (CBLDocument*)document {
-    NSString* type = [document propertyForKey: @"type"];
+    NSString* type = [document propertyForKey: @"doc_type"];
     return type ? [self classForDocumentType: type] : nil;
 }
 

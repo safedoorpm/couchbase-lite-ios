@@ -1094,16 +1094,16 @@ static NSArray* reverse(NSArray* a) {
 
 - (void) test19_Grouped_NoReduce {
     RequireTestCase(Grouped);
-    [self putDoc: $dict({@"_id", @"1"}, {@"type", @"A"})];
-    [self putDoc: $dict({@"_id", @"2"}, {@"type", @"A"})];
-    [self putDoc: $dict({@"_id", @"3"}, {@"type", @"B"})];
-    [self putDoc: $dict({@"_id", @"4"}, {@"type", @"B"})];
-    [self putDoc: $dict({@"_id", @"5"}, {@"type", @"C"})];
-    [self putDoc: $dict({@"_id", @"6"}, {@"type", @"C"})];
+    [self putDoc: $dict({@"_id", @"1"}, {@"doc_type", @"A"})];
+    [self putDoc: $dict({@"_id", @"2"}, {@"doc_type", @"A"})];
+    [self putDoc: $dict({@"_id", @"3"}, {@"doc_type", @"B"})];
+    [self putDoc: $dict({@"_id", @"4"}, {@"doc_type", @"B"})];
+    [self putDoc: $dict({@"_id", @"5"}, {@"doc_type", @"C"})];
+    [self putDoc: $dict({@"_id", @"6"}, {@"doc_type", @"C"})];
 
     CBLView* view = [db viewNamed: @"GroupByType"];
     [view setMapBlock: MAPBLOCK({
-        NSString *type = doc[@"type"];
+        NSString *type = doc[@"doc_type"];
         if (type)
             emit(type, nil);
     }) version:@"1.0"];

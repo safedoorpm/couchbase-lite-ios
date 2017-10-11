@@ -438,7 +438,7 @@ DefineLogDomain(Query);
             }
         }
         if (_updateAgain)
-            [self update];
+			[self update];
     }];
 }
 

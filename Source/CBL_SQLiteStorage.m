@@ -1775,7 +1775,7 @@ NSString* CBLJoinSQLQuotedStrings(NSArray* strings) {
                                                current: YES
                                         hasAttachments: (properties.cbl_attachments != nil)
                                                   JSON: json
-                                               docType: properties[@"type"]];
+                                               docType: properties[@"doc_type"]];
         if (!sequence) {
             // The insert failed. If it was due to a constraint violation, that means a revision
             // already exists with identical contents and the same parent rev. We can ignore this
@@ -1949,7 +1949,7 @@ NSString* CBLJoinSQLQuotedStrings(NSArray* strings) {
                 json = [self encodeDocumentJSON: rev];
                 if (!json)
                     return kCBLStatusBadJSON;
-                docType = rev[@"type"];
+                docType = rev[@"doc_type"];
                 current = YES;
             } else {
                 // It's an intermediate parent, so insert a stub:

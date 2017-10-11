@@ -1148,7 +1148,7 @@ static inline void cleanup_C4ExpiryEnumerator(C4ExpiryEnumerator **e) { c4exp_fr
         c4doc_selectCurrentRevision(doc);
         properties = [CBLForestBridge bodyOfSelectedRevision: doc];
     }
-    c4doc_setType(doc, string2slice(properties[@"type"]));
+    c4doc_setType(doc, string2slice(properties[@"doc_type"]));
     // Save:
     return c4doc_save(doc, _maxRevTreeDepth, outErr);
 }

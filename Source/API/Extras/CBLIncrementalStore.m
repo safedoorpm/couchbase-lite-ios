@@ -42,7 +42,7 @@ NSString* const kCBLISCustomPropertyQueryBooleanWithNumber = @"CBLISCustomProper
 static NSString* const kCBLISMetadataDocumentID = @"CBLIS_metadata";
 static NSString* const kCBLISMetadata_DefaultTypeKey = @"type_key";
 
-static NSString* const kCBLISDefaultTypeKey = @"type";
+static NSString* const kCBLISDefaultTypeKey = @"doc_type";
 static NSString* const kCBLISOldDefaultTypeKey = @"CBLIS_type";
 
 static NSString* const kCBLISRevisionAttributeName = @"CBLIS_Rev";
@@ -467,7 +467,7 @@ static CBLManager* sCBLManager;
     if (!metadata) {
         // This shouldn't happen unless the metadata local doc was unexpectedly deleted.
         ERROR(@"Cannot get the metadata document while determining the document type key. "
-              "The default 'type' key will be used. (Error: %@)", error);
+              "The default 'doc_type' key will be used. (Error: %@)", error);
     }
 
     if (metadata[kCBLISMetadata_DefaultTypeKey])

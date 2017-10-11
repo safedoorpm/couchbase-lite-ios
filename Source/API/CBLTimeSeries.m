@@ -248,7 +248,7 @@ typedef NSArray<CBLJSONDict*> EventArray;
             event[@"dt"] = @(millis - lastMillis);
         lastMillis = millis;
     }
-    NSDictionary* doc = @{@"_id": docID, @"type": _docType, @"t0": time0String, @"events": events};
+    NSDictionary* doc = @{@"_id": docID, @"doc_type": _docType, @"t0": time0String, @"events": events};
 
     // Now add to the queue of docs to be inserted:
     BOOL firstDoc = NO;
